@@ -486,18 +486,17 @@ In this case, database.xml stays at whatever version you originally had.
 
 ### 훅 설치하기 ###
 
-
 훅 스크립트를 사용하기 위해 파일을 Git 디렉터리의  `hooks` 서브디렉리에 적절한 이름과 실행 권한을 설정하여야 합니다.  이 부분만 확인하면 다음부터는 호출이 됩니다.  여기에선 대부분 주요 훅 파일 이름을 다루겠습니다.
 
 ### 클라이언트 측 훅 ###
 
-There are a lot of client-side hooks. This section splits them into committing-workflow hooks, e-mail-workflow scripts, and the rest of the client-side scripts.
+다양한 클라이언트 측 훅이 있습니다. 이 장에서는 커밋 작업 훅, 이메일 작업 훅, 기타 클라이언트 측 훅으로 나누겠습니다.
 
-#### Committing-Workflow Hooks ####
+#### 커밋 작업 훅 ####
 
-The first four hooks have to do with the committing process. The `pre-commit` hook is run first, before you even type in a commit message. It’s used to inspect the snapshot that’s about to be committed, to see if you’ve forgotten something, to make sure tests run, or to examine whatever you need to inspect in the code. Exiting non-zero from this hook aborts the commit, although you can bypass it with `git commit --no-verify`. You can do things like check for code style (run lint or something equivalent), check for trailing whitespace (the default hook does exactly that), or check for appropriate documentation on new methods.
+첫 번째 훅은 커밋 과정 동안 일을 합니다. 어떤 커밋 메시지를 입력하기 전에 `pre-commit` 훅이 먼저 수행되죠. 이 훅들을 커밋할 내용에 대한 스냅샷을 점검하거나, 무언가 빠뜨린 부분을 찾거나, 또는 테스트가 수행된 것을 확인하기 위해, 혹은 코드 내에 점검하기 원하는 무언가를 조사하기 위해 사용할 수 있습니다. 이 훅에서 0이 아닌 값으로 종료될 때 커밋은 중단됩니다. 물론 `git commit --no-verity`로 통과시킬 수 있지만요. (lint나 다른 비슷한 것을 수행시켜) 코드 스타일을 검증하거나 (기본 훅이 하는) 여분의 공백을 확인하거나 메서드에 적절한 문서가 있는지 검증할 수 있습니다. 
 
-The `prepare-commit-msg` hook is run before the commit message editor is fired up but after the default message is created. It lets you edit the default message before the commit author sees it. This hook takes a few options: the path to the file that holds the commit message so far, the type of commit, and the commit SHA-1 if this is an amended commit. This hook generally isn’t useful for normal commits; rather, it’s good for commits where the default message is auto-generated, such as templated commit messages, merge commits, squashed commits, and amended commits. You may use it in conjunction with a commit template to programmatically insert information.
+`prepare-commit-msg` 훅은 기본 메시지가 생성 된 후  커밋 메시지 편집기가가 작동되기 전에 수행됩니다.  커밋 작성자가 편집기를 보기 전에  기본 메시지가 변경되는 것입니다. 이 훅은 몇 가지 선택지가 있습니다. 현재까지 커밋 메시지를 담은 파일들의 경로, 커밋 타입,  amend 커밋일 때 커밋 SHA-1입니다. 이 훅은 대게 일반 커밋에는 적합하지 않지만, 기본 메시지가 자동생성되는 서식 커밋 메시지, 머지 커밋,  squash 커밋, amend 커밋에서 적합하다  일정한 순서대로 정보를 삽입하기 위해 커밋 서식과 함께 사용할 수 있다.
 
 The `commit-msg` hook takes one parameter, which again is the path to a temporary file that contains the current commit message. If this script exits non-zero, Git aborts the commit process, so you can use it to validate your project state or commit message before allowing a commit to go through. In the last section of this chapter, I’ll demonstrate using this hook to check that your commit message is conformant to a required pattern.
 
