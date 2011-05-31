@@ -492,15 +492,17 @@ In this case, database.xml stays at whatever version you originally had.
 
 다양한 클라이언트 측 훅이 있습니다. 이 장에서는 커밋 작업 훅, 이메일 작업 훅, 기타 클라이언트 측 훅으로 나누겠습니다.
 
-#### 커밋 작업 훅 ####
+#### 커밋 작업 흐름 훅 ####
 
-첫 번째 훅은 커밋 과정 동안 일을 합니다. 어떤 커밋 메시지를 입력하기 전에 `pre-commit` 훅이 먼저 수행되죠. 이 훅들을 커밋할 내용에 대한 스냅샷을 점검하거나, 무언가 빠뜨린 부분을 찾거나, 또는 테스트가 수행된 것을 확인하기 위해, 혹은 코드 내에 점검하기 원하는 무언가를 조사하기 위해 사용할 수 있습니다. 이 훅에서 0이 아닌 값으로 종료될 때 커밋은 중단됩니다. 물론 `git commit --no-verity`로 통과시킬 수 있지만요. (lint나 다른 비슷한 것을 수행시켜) 코드 스타일을 검증하거나 (기본 훅이 하는) 여분의 공백을 확인하거나 메서드에 적절한 문서가 있는지 검증할 수 있습니다. 
+첫 번째 훅은 커밋 작업 흐름 동안 일을 합니다. 어떤 커밋 메시지를 입력하기 전에 `pre-commit` 훅이 먼저 수행되죠. 이 훅들을 커밋할 내용에 대한 스냅샷을 점검하거나, 무언가 빠뜨린 부분을 찾거나, 또는 테스트가 수행된 것을 확인하기 위해, 혹은 코드 내에 점검하기 원하는 무언가를 조사하기 위해 사용할 수 있습니다. 이 훅에서 0이 아닌 값으로 종료될 때 커밋은 중단됩니다. 물론 `git commit --no-verity`로 통과시킬 수 있지만요. (lint나 다른 비슷한 것을 수행시켜) 코드 스타일을 검증하거나 (기본 훅이 하는) 여분의 공백을 확인하거나 메서드에 적절한 문서가 있는지 검증할 수 있습니다. 
 
-`prepare-commit-msg` 훅은 기본 메시지가 생성 된 후  커밋 메시지 편집기가가 작동되기 전에 수행됩니다.  커밋 작성자가 편집기를 보기 전에  기본 메시지가 변경되는 것입니다. 이 훅은 몇 가지 선택지가 있습니다. 현재까지 커밋 메시지를 담은 파일들의 경로, 커밋 타입,  amend 커밋일 때 커밋 SHA-1입니다. 이 훅은 대게 일반 커밋에는 적합하지 않지만, 기본 메시지가 자동생성되는 서식 커밋 메시지, 머지 커밋,  squash 커밋, amend 커밋에서 적합하다  일정한 순서대로 정보를 삽입하기 위해 커밋 서식과 함께 사용할 수 있다.
+`prepare-commit-msg` 훅은 기본 메시지가 생성 된 후  커밋 메시지 편집기가가 작동되기 전에 수행됩니다.  커밋 작성자가 편집기를 보기 전에  기본 메시지가 변경되는 것입니다. 이 훅은 몇 가지 선택지가 있습니다. 현재까지 커밋 메시지를 담은 파일들의 경로, 커밋 타입,  amend 커밋일 때 커밋 SHA-1입니다. 이 훅은 대게 일반 커밋에는 적합하지 않지만, 기본 메시지가 자동생성되는 서식 커밋 메시지, 머지 커밋,  squash 커밋, amend 커밋에서 적합하다  일정한 순서대로 정보를 삽입하기 위해 커밋 서식과 함께 사용할 수 있습니다.
 
-The `commit-msg` hook takes one parameter, which again is the path to a temporary file that contains the current commit message. If this script exits non-zero, Git aborts the commit process, so you can use it to validate your project state or commit message before allowing a commit to go through. In the last section of this chapter, I’ll demonstrate using this hook to check that your commit message is conformant to a required pattern.
+`commit-msg` 훅은 하나의 파라미터를 받는데 현재 커밋 메시지를 담은 임시 파일의 경로입니다. 만약 0이 아닌 값으로 스크립트가 끝나면 Git는 커밋 절차를 중단하여, 커밋을 진행하기 앞서 프로젝트의 상태나 커밋 메시지를 검증하게 합니다. 이 장의 마지막 절에서, 커밋 메시지가 요구된 패턴에 맞는지 확인하는 훅을 보여드리겠습니다.
 
-After the entire commit process is completed, the `post-commit` hook runs. It doesn’t take any parameters, but you can easily get the last commit by running `git log -1 HEAD`. Generally, this script is used for notification or something similar.
+전체 커밋 절차가 끝나기 전에, `post-commit` 훅이 실행됩니다. 파라미터를 받지 않은데, `git log -1 HEAD`를 수행시켜 마지막 커밋를 쉽게 받아올 수 있습니다. 보통, 이 스크립트는 알림 같은 것을 위해 쓰입니다.
+
+커밋 작업 흐름 클라이언트 측 스크립트는 어떤 작업 흐름에서 사용됩니다.  
 
 The committing-workflow client-side scripts can be used in just about any workflow. They’re often used to enforce certain policies, although it’s important to note that these scripts aren’t transferred during a clone. You can enforce policy on the server side to reject pushes of commits that don’t conform to some policy, but it’s entirely up to the developer to use these scripts on the client side. So, these are scripts to help developers, and they must be set up and maintained by them, although they can be overridden or modified by them at any time.
 
